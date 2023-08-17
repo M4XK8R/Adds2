@@ -67,14 +67,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
-    private fun launchSignInDialog() {
-        dialogHelper.createDialog(DialogHelperConstants.LOG_IN_STATE)
-    }
-
-    private fun launchRegisterDialog() {
-        dialogHelper.createDialog(DialogHelperConstants.REGISTER_STATE)
-    }
-
     fun updateUi(firebaseUser: FirebaseUser?) {
         tvAccount.text = if (firebaseUser == null) "not logged in" else firebaseUser.email
     }
@@ -83,6 +75,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     /**
      * PRIVATE FUNCTIONS
      */
+
+    private fun launchSignInDialog() {
+        dialogHelper.setUpAlertDialog(DialogHelperConstants.LOG_IN_STATE)
+    }
+
+    private fun launchRegisterDialog() {
+        dialogHelper.setUpAlertDialog(DialogHelperConstants.REGISTER_STATE)
+    }
+
     private fun makeToastNavTest(id: String) {
         Toast.makeText(this, "Pressed $id", Toast.LENGTH_SHORT).show()
     }
@@ -90,7 +91,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setUpDrawerListenerInterface() {
         dialogHelper.drawerListener = object : DrawerListener {
             override fun drawerAction() {
-                binding.drawerLayout.openDrawer(GravityCompat.START)
+                openDrawer()
             }
         }
     }
@@ -109,6 +110,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
 
         binding.drawer.setNavigationItemSelectedListener(this)
+        openDrawer()
+    }
+
+    private fun openDrawer() {
         binding.drawerLayout.openDrawer(GravityCompat.START)
     }
+
 }

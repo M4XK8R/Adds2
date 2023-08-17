@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">Adds2</string>
+
+    <!--  Drawer  -->
+    <string name="my_adds">My adds</string>
+    <string name="cars">Cars</string>
+    <string name="computers">Computers</string>
+    <string name="smartphones">Smartphones</string>
+    <string name="appliances">Appliances</string>
+    <string name="account">Account</string>
+    <string name="register">Register</string>
+    <string name="log_in">Log in</string>
+    <string name="log_out">Log out</string>
+
+    <string name="close_drawer">Close drawer</string>
+    <string name="open_drawer">Open drawer</string>
+
+    <string name="email">freyaspice@gmail.com</string>
+    <string name="avatar">Avatar</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="register_now">Register now</string>
+    <string name="forgot_password">Forgot password?</string>
 </resources>

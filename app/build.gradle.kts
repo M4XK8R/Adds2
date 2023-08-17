@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -30,9 +31,17 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+   buildFeatures{
+       viewBinding = true
+   }
 }
 
 dependencies {
+
+    // Firebase
+    implementation("com.google.firebase:firebase-database-ktx:20.2.2")
+    implementation("com.google.firebase:firebase-auth-ktx:22.1.1")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.7.0")
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")

@@ -4,9 +4,9 @@ import android.widget.Toast
 import com.example.adds2.MainActivity
 import com.google.firebase.auth.FirebaseUser
 
-class AccountHelper(private val mainActivity: MainActivity) {
+class EmailHelper(private val mainActivity: MainActivity) {
 
-    var needCloseTheDialog = false
+    var needCloseTheDialog = true
 
     fun registerWithEmail(email: String, password: String) {
         fun isDataValid() = (email.isNotEmpty() && password.isNotEmpty())

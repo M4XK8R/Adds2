@@ -21,4 +21,6 @@
     <string name="password_hint">Password</string>
     <string name="register_now">Register now</string>
     <string name="forgot_password">Forgot password?</string>
+    <string name="your_web_client_id">1048315406270-cnd6bdadcv84ree0j8h5n5n1ae7gg01p.apps.googleusercontent.com</string>
+    <string name="your_web_client_id2">1048315406270-ku73i596ru6sllk6gq2jekclle1hof1f.apps.googleusercontent.com</string>
 </resources>

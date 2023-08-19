@@ -1,12 +1,15 @@
 package com.example.adds2
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
+import com.example.adds2.accounthelper.GoogleHelper
 import com.example.adds2.databinding.ActivityMainBinding
 import com.example.adds2.dialoghelper.DialogHelper
 import com.example.adds2.dialoghelper.DialogHelperConstants
@@ -17,13 +20,17 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+private const val TAG = "MainActivity"
+
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var tvAccount: TextView
 
     private var firebaseUser: FirebaseUser? = null
-    private val dialogHelper = DialogHelper(this)
+
+    private lateinit var dialogHelper: DialogHelper
+    private lateinit var googleHelper: GoogleHelper
 
     lateinit var auth: FirebaseAuth
 
@@ -34,17 +41,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(binding.root)
 
         auth = Firebase.auth
+        dialogHelper = DialogHelper(this)
+        googleHelper = GoogleHelper(this)
+
         val header = binding.drawer.getHeaderView(0)
         tvAccount = header.findViewById(R.id.tvAccountEmail)
 
         setUpDrawer()
         setUpDrawerListenerInterface()
+
+        firebaseUser = auth.currentUser
+        var currentUser = auth.getCurrentUser()
     }
 
     override fun onStart() {
         super.onStart()
         firebaseUser = auth.currentUser
+        Log.d(TAG, "firebaseUser = $firebaseUser")
         updateUi(firebaseUser)
+//        updateUi(googleHelper.)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        googleHelper.onActivityResultUtil(requestCode, data)
+        Log.d(TAG, "firebaseUser = $firebaseUser")
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -53,9 +74,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.diCars -> makeToastNavTest("diCars")
             R.id.diComputers -> makeToastNavTest("diComputers")
             R.id.diSmartphones -> makeToastNavTest("diSmartphones")
-            R.id.diAppliances -> makeToastNavTest("diAppliances")
-            R.id.diRegister -> launchRegisterDialog()
-            R.id.diLogIn -> launchSignInDialog()
+            R.id.diAppliances -> closeDrawer()
+            R.id.diRegister -> {
+                launchRegisterDialog()
+                closeDrawer()
+            }
+
+            R.id.diLogIn -> {
+                launchSignInDialog()
+                closeDrawer()
+            }
+
             R.id.diLogOut -> {
                 auth.signOut()
                 updateUi(null)
@@ -63,7 +92,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             else -> return true
         }
-        binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
 
@@ -71,10 +99,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         tvAccount.text = if (firebaseUser == null) "not logged in" else firebaseUser.email
     }
 
+    fun updateUi(text: String) {
+        tvAccount.text = text
+    }
 
     /**
      * PRIVATE FUNCTIONS
      */
+    private fun closeDrawer() {
+        binding.drawerLayout.closeDrawer(GravityCompat.START)
+    }
 
     private fun launchSignInDialog() {
         dialogHelper.setUpAlertDialog(DialogHelperConstants.LOG_IN_STATE)

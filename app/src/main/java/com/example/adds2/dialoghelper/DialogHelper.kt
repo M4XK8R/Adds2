@@ -1,17 +1,19 @@
 package com.example.adds2.dialoghelper
 
 import android.app.AlertDialog
-import android.util.Log
 import android.view.LayoutInflater
 import androidx.viewbinding.ViewBinding
 import com.example.adds2.MainActivity
-import com.example.adds2.accounthelper.AccountHelper
+import com.example.adds2.accounthelper.EmailHelper
+import com.example.adds2.accounthelper.GoogleHelper
+import com.example.adds2.databinding.LogInDialogBinding
 import com.example.adds2.databinding.RegisterDialogBinding
-import com.example.adds2.databinding.SignDialogBinding
+import com.example.adds2.makeToast
 
 class DialogHelper(private val mainActivity: MainActivity) {
 
-    private val accountHelper = AccountHelper(mainActivity)
+    private val emailHelper = EmailHelper(mainActivity)
+    private val googleHelper = GoogleHelper(mainActivity)
     var drawerListener: DrawerListener? = null
 
     fun setUpAlertDialog(state: Int) {
@@ -23,7 +25,6 @@ class DialogHelper(private val mainActivity: MainActivity) {
         setUpButtonsClickListeners(binding, alertDialog)
     }
 
-
     /**
      * PRIVATE FUNCTIONS
      */
@@ -32,7 +33,7 @@ class DialogHelper(private val mainActivity: MainActivity) {
             RegisterDialogBinding.inflate(LayoutInflater.from(mainActivity))
 
         DialogHelperConstants.LOG_IN_STATE ->
-            SignDialogBinding.inflate(LayoutInflater.from(mainActivity))
+            LogInDialogBinding.inflate(LayoutInflater.from(mainActivity))
 
         else -> throw Exception("Unknown state: $state")
     }
@@ -47,39 +48,80 @@ class DialogHelper(private val mainActivity: MainActivity) {
         }
         .create()
 
-    private fun setUpButtonsClickListeners(
-        binding: ViewBinding,
+    private fun setUpButtonsClickListeners(binding: ViewBinding, alertDialog: AlertDialog) {
+        when (binding) {
+            is RegisterDialogBinding -> {
+                setUpBtnRegisterListener(binding, alertDialog)
+            }
+
+            is LogInDialogBinding -> {
+                setUpBtnSignInOneTapClickListener(binding, alertDialog)
+                setUpBtnLogInClickListener(binding, alertDialog)
+                setUpBtnForgotPasswordClickListener(binding)
+            }
+        }
+    }
+
+    private fun setUpBtnSignInOneTapClickListener(
+        binding: LogInDialogBinding,
         alertDialog: AlertDialog
     ) {
-        if (binding is RegisterDialogBinding) {
-            binding.btnRegister.setOnClickListener {
-                val email = binding.etEmail.text.toString()
-                val password = binding.etPassword.text.toString()
-                accountHelper.registerWithEmail(email, password)
-                Log.d(
-                    "closeDialogIfPossible",
-                    "accountHelper.needCloseTheDialog = ${accountHelper.needCloseTheDialog}"
+        binding.btnSignInOneTap.setOnClickListener {
+            googleHelper.oneTapSignIn()
+            closeDialogIfPossible(alertDialog)
+        }
+    }
+
+    private fun setUpBtnForgotPasswordClickListener(binding: LogInDialogBinding) {
+        binding.btnForgotPassword.setOnClickListener {
+            val email = binding.etEmail.text.toString()
+            if (email.isNotEmpty()) {
+                mainActivity.auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        makeToast(
+                            mainActivity,
+                            "sendPasswordResetEmail request is Successful"
+                        )
+                    } else {
+                        makeToast(
+                            mainActivity,
+                            "sendPasswordResetEmail request is Failed"
+                        )
+                    }
+                }
+            } else {
+                makeToast(
+                    mainActivity,
+                    "email must be at least blablabla..."
                 )
+            }
+        }
+    }
+
+    private fun setUpBtnLogInClickListener(binding: LogInDialogBinding, alertDialog: AlertDialog) {
+        with(binding) {
+            btnLogIn.setOnClickListener {
+                val email = etEmail.text.toString()
+                val password = etPassword.text.toString()
+                emailHelper.signInWithEmail(email, password)
                 closeDialogIfPossible(alertDialog)
             }
         }
+    }
 
-        if (binding is SignDialogBinding) {
-            binding.btnSignIn.setOnClickListener {
-                val email = binding.etEmail.text.toString()
-                val password = binding.etPassword.text.toString()
-                accountHelper.signInWithEmail(email, password)
-                Log.d(
-                    "closeDialogIfPossible",
-                    "accountHelper.needCloseTheDialog = ${accountHelper.needCloseTheDialog}"
-                )
+    private fun setUpBtnRegisterListener(binding: RegisterDialogBinding, alertDialog: AlertDialog) {
+        with(binding) {
+            btnRegister.setOnClickListener {
+                val email = etEmail.text.toString()
+                val password = etPassword.text.toString()
+                emailHelper.registerWithEmail(email, password)
                 closeDialogIfPossible(alertDialog)
             }
         }
     }
 
     private fun closeDialogIfPossible(alertDialog: AlertDialog) {
-        if (accountHelper.needCloseTheDialog) {
+        if (emailHelper.needCloseTheDialog) {
             alertDialog.dismiss()
             drawerListener?.drawerAction()
         }

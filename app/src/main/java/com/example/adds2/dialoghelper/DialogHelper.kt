@@ -2,18 +2,19 @@ package com.example.adds2.dialoghelper
 
 import android.app.AlertDialog
 import android.view.LayoutInflater
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
-import com.example.adds2.MainActivity
+import com.example.adds2.App
 import com.example.adds2.accounthelper.EmailHelper
 import com.example.adds2.accounthelper.GoogleHelper
 import com.example.adds2.databinding.LogInDialogBinding
 import com.example.adds2.databinding.RegisterDialogBinding
 import com.example.adds2.makeToast
 
-class DialogHelper(private val mainActivity: MainActivity) {
+class DialogHelper(private val activity: AppCompatActivity) {
 
-    private val emailHelper = EmailHelper(mainActivity)
-    private val googleHelper = GoogleHelper(mainActivity)
+    private val emailHelper = EmailHelper(activity)
+    private val googleHelper = GoogleHelper(activity)
     var drawerListener: DrawerListener? = null
 
     fun setUpAlertDialog(state: Int) {
@@ -30,16 +31,16 @@ class DialogHelper(private val mainActivity: MainActivity) {
      */
     private fun initBinding(state: Int) = when (state) {
         DialogHelperConstants.REGISTER_STATE ->
-            RegisterDialogBinding.inflate(LayoutInflater.from(mainActivity))
+            RegisterDialogBinding.inflate(LayoutInflater.from(activity))
 
         DialogHelperConstants.LOG_IN_STATE ->
-            LogInDialogBinding.inflate(LayoutInflater.from(mainActivity))
+            LogInDialogBinding.inflate(LayoutInflater.from(activity))
 
         else -> throw Exception("Unknown state: $state")
     }
 
     private fun createAlertDialog(binding: ViewBinding) = AlertDialog
-        .Builder(mainActivity)
+        .Builder(activity)
         .setView(binding.root)
         .setCancelable(false)
         .setNegativeButton("CANCEL") { dialog, _ ->
@@ -76,22 +77,22 @@ class DialogHelper(private val mainActivity: MainActivity) {
         binding.btnForgotPassword.setOnClickListener {
             val email = binding.etEmail.text.toString()
             if (email.isNotEmpty()) {
-                mainActivity.auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+                App.firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         makeToast(
-                            mainActivity,
+                            activity,
                             "sendPasswordResetEmail request is Successful"
                         )
                     } else {
                         makeToast(
-                            mainActivity,
+                            activity,
                             "sendPasswordResetEmail request is Failed"
                         )
                     }
                 }
             } else {
                 makeToast(
-                    mainActivity,
+                    activity,
                     "email must be at least blablabla..."
                 )
             }

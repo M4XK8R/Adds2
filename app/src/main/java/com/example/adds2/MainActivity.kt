@@ -1,24 +1,23 @@
 package com.example.adds2
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import com.example.adds2.accounthelper.EmailHelper
 import com.example.adds2.accounthelper.GoogleHelper
 import com.example.adds2.databinding.ActivityMainBinding
+import com.example.adds2.dialoghelper.ActivityListener
 import com.example.adds2.dialoghelper.DialogHelper
 import com.example.adds2.dialoghelper.DialogHelperConstants
 import com.example.adds2.dialoghelper.DrawerListener
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 private const val TAG = "MainActivity"
 
@@ -27,20 +26,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var binding: ActivityMainBinding
     private lateinit var tvAccount: TextView
 
-    private var firebaseUser: FirebaseUser? = null
-
     private lateinit var dialogHelper: DialogHelper
     private lateinit var googleHelper: GoogleHelper
+    private lateinit var emailHelper: EmailHelper
 
-    lateinit var auth: FirebaseAuth
 
+    private var firebaseUser: FirebaseUser? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        auth = Firebase.auth
         dialogHelper = DialogHelper(this)
         googleHelper = GoogleHelper(this)
 
@@ -50,16 +47,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setUpDrawer()
         setUpDrawerListenerInterface()
 
-        firebaseUser = auth.currentUser
-        var currentUser = auth.getCurrentUser()
+        setUpActivityListenerInterfaceGoogle()
+
+        firebaseUser = App.firebaseAuth.currentUser
     }
 
     override fun onStart() {
         super.onStart()
-        firebaseUser = auth.currentUser
+        firebaseUser = App.firebaseAuth.currentUser
         Log.d(TAG, "firebaseUser = $firebaseUser")
         updateUi(firebaseUser)
-//        updateUi(googleHelper.)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -86,7 +83,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             R.id.diLogOut -> {
-                auth.signOut()
+                App.firebaseAuth.signOut()
                 updateUi(null)
             }
 
@@ -95,17 +92,44 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
-    fun updateUi(firebaseUser: FirebaseUser?) {
-        tvAccount.text = if (firebaseUser == null) "not logged in" else firebaseUser.email
-    }
 
-    fun updateUi(text: String) {
-        tvAccount.text = text
-    }
+//    fun updateUi(text: String) {
+//        tvAccount.text = text
+//    }
 
     /**
      * PRIVATE FUNCTIONS
      */
+    private fun setUpActivityListenerInterfaceGoogle() {
+        googleHelper.activityListener = object : ActivityListener {
+
+            override fun updateUi(text: String) {
+                tvAccount.text = text
+            }
+
+            override fun updateUi(firebaseUser: FirebaseUser?) {
+                tvAccount.text = firebaseUser.toString()
+            }
+        }
+    }
+
+    private fun setUpActivityListenerInterfaceEmail() {
+        emailHelper.activityListener = object : ActivityListener {
+
+            override fun updateUi(text: String) {
+                tvAccount.text = text
+            }
+
+            override fun updateUi(firebaseUser: FirebaseUser?) {
+                tvAccount.text = firebaseUser.toString()
+            }
+        }
+    }
+
+    private fun updateUi(firebaseUser: FirebaseUser?) {
+        tvAccount.text = if (firebaseUser == null) "not logged in" else firebaseUser.email
+    }
+
     private fun closeDrawer() {
         binding.drawerLayout.closeDrawer(GravityCompat.START)
     }

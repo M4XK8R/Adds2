@@ -3,9 +3,10 @@ package com.example.adds2.accounthelper
 import android.content.Intent
 import android.content.IntentSender
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.startIntentSenderForResult
-import com.example.adds2.MainActivity
 import com.example.adds2.R
+import com.example.adds2.dialoghelper.ActivityListener
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.common.api.ApiException
@@ -13,20 +14,17 @@ import com.google.android.gms.common.api.ApiException
 private const val REQ_ONE_TAP = 2  // Can be any integer unique to the Activity
 private const val TAG = "GoogleHelper"
 
-class GoogleHelper(private val mainActivity: MainActivity) {
+class GoogleHelper(private val activity: AppCompatActivity) {
 
-    //    private lateinit var oneTapClient: SignInClient
-//    private lateinit var signInRequest: BeginSignInRequest
-//    Developer console is not set up correctly
+    var activityListener: ActivityListener? = null
 
-
-    private val oneTapClient = Identity.getSignInClient(mainActivity)
+    private val oneTapClient = Identity.getSignInClient(activity)
 
     private val signInRequest = BeginSignInRequest.builder()
         .setGoogleIdTokenRequestOptions(
             BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                 .setSupported(true)
-                .setServerClientId(mainActivity.getString(R.string.your_web_client_id))
+                .setServerClientId(activity.getString(R.string.your_web_client_id))
                 .setFilterByAuthorizedAccounts(false)
                 .build()
         )
@@ -34,10 +32,10 @@ class GoogleHelper(private val mainActivity: MainActivity) {
 
     fun oneTapSignIn() {
         oneTapClient.beginSignIn(signInRequest)
-            .addOnSuccessListener(mainActivity) { result ->
+            .addOnSuccessListener(activity) { result ->
                 try {
                     startIntentSenderForResult(
-                        mainActivity,
+                        activity,
                         result.pendingIntent.intentSender,
                         REQ_ONE_TAP,
                         null,
@@ -50,7 +48,7 @@ class GoogleHelper(private val mainActivity: MainActivity) {
                     Log.e(TAG, "Couldn't start One Tap UI: ${e.localizedMessage}")
                 }
             }
-            .addOnFailureListener(mainActivity) { e ->
+            .addOnFailureListener(activity) { e ->
                 // No saved credentials found. Launch the One Tap sign-up flow, or
                 // do nothing and continue presenting the signed-out UI.
                 Log.d(TAG, "addOnFailureListener Holy shit: ${e.localizedMessage}")
@@ -67,10 +65,9 @@ class GoogleHelper(private val mainActivity: MainActivity) {
                     val password = credential.password
                     when {
                         idToken != null -> {
-                            // Got an ID token from Google. Use it to authenticate
-                            // with your backend.
                             Log.d(TAG, "Got ID token.")
-                           mainActivity.updateUi(username)
+                            activityListener?.updateUi(username)
+//
                         }
 
                         password != null -> {

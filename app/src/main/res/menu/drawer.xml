@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <item android:title="@string/app_name" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/diMyAdds"
+            android:title="@string/my_adds"
+            android:textSize="25dp"/>
+        <item
+            android:id="@+id/diCars"
+            android:title="@string/cars" />
+        <item
+            android:id="@+id/diComputers"
+            android:title="@string/computers" />
+        <item
+            android:id="@+id/diSmartphones"
+            android:title="@string/smartphones" />
+        <item
+            android:id="@+id/diAppliances"
+            android:title="@string/appliances" />
+    </group>
+
+    <item android:title="@string/account" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/diRegister"
+            android:title="@string/register" />
+        <item
+            android:id="@+id/diLogIn"
+            android:title="@string/log_in" />
+        <item
+            android:id="@+id/diLogOut"
+            android:title="@string/log_out" />
+    </group>
+
+</menu>
+
+
+
+
+
+
+
+
+
+
+
+

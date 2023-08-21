@@ -1,16 +1,15 @@
 package com.example.adds2.accounthelper
 
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.adds2.App
-import com.example.adds2.dialoghelper.ActivityListener
+import com.example.adds2.needCloseTheDialog
 import com.google.firebase.auth.FirebaseUser
 
 class EmailHelper(private val activity: AppCompatActivity) {
 
-    var activityListener: ActivityListener? = null
-    var needCloseTheDialog = true
-
+//    var needCloseTheDialog = true
 
     fun registerWithEmail(email: String, password: String) {
         fun isDataValid() = (email.isNotEmpty() && password.isNotEmpty())
@@ -18,9 +17,15 @@ class EmailHelper(private val activity: AppCompatActivity) {
             App.firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+
                         val user = task.result?.user ?: throw Exception("user is null")
                         sendEmailVerification(user)
-                        activityListener?.updateUi(user)
+                        Log.d(
+                            "activityListenerLambda",
+                            "Register activityListenerLambda = ${App.activityListenerLambda}"
+                        )
+                        App.activityListenerLambda?.invoke()
+                        makeToast("Auth task is successful!")
                         needCloseTheDialog = true
                     } else {
                         needCloseTheDialog = false
@@ -40,7 +45,12 @@ class EmailHelper(private val activity: AppCompatActivity) {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val user = task.result.user
-                       activityListener?.updateUi(user)
+                        Log.d(
+                            "activityListenerLambda",
+                            "Sign in activityListenerLambda = ${App.activityListenerLambda}"
+                        )
+                        App.activityListenerLambda?.invoke()
+                        makeToast("Auth task is successful!")
                         needCloseTheDialog = true
                     } else {
                         needCloseTheDialog = false

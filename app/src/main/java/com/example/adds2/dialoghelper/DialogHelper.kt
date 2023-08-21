@@ -1,6 +1,7 @@
 package com.example.adds2.dialoghelper
 
 import android.app.AlertDialog
+import android.util.Log
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
@@ -10,12 +11,14 @@ import com.example.adds2.accounthelper.GoogleHelper
 import com.example.adds2.databinding.LogInDialogBinding
 import com.example.adds2.databinding.RegisterDialogBinding
 import com.example.adds2.makeToast
+import com.example.adds2.needCloseTheDialog
 
 class DialogHelper(private val activity: AppCompatActivity) {
 
     private val emailHelper = EmailHelper(activity)
     private val googleHelper = GoogleHelper(activity)
-    var drawerListener: DrawerListener? = null
+
+    var drawerListenerLambda: (() -> Unit)? = null
 
     fun setUpAlertDialog(state: Int) {
         val binding = initBinding(state)
@@ -39,13 +42,13 @@ class DialogHelper(private val activity: AppCompatActivity) {
         else -> throw Exception("Unknown state: $state")
     }
 
-    private fun createAlertDialog(binding: ViewBinding) = AlertDialog
-        .Builder(activity)
+    private fun createAlertDialog(binding: ViewBinding) = AlertDialog.Builder(activity)
         .setView(binding.root)
         .setCancelable(false)
         .setNegativeButton("CANCEL") { dialog, _ ->
             dialog.dismiss()
-            drawerListener?.drawerAction()
+            Log.d("drawerListenerLambda", "Create dialog drawerListenerLambda = $drawerListenerLambda")
+            drawerListenerLambda?.invoke()
         }
         .create()
 
@@ -122,9 +125,9 @@ class DialogHelper(private val activity: AppCompatActivity) {
     }
 
     private fun closeDialogIfPossible(alertDialog: AlertDialog) {
-        if (emailHelper.needCloseTheDialog) {
+        if (needCloseTheDialog) {
             alertDialog.dismiss()
-            drawerListener?.drawerAction()
+            drawerListenerLambda?.invoke()
         }
     }
 

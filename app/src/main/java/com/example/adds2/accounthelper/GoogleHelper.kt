@@ -5,18 +5,21 @@ import android.content.IntentSender
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.startIntentSenderForResult
+import com.example.adds2.App
 import com.example.adds2.R
-import com.example.adds2.dialoghelper.ActivityListener
+import com.example.adds2.needCloseTheDialog
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.GoogleAuthProvider
 
 private const val REQ_ONE_TAP = 2  // Can be any integer unique to the Activity
 private const val TAG = "GoogleHelper"
 
 class GoogleHelper(private val activity: AppCompatActivity) {
 
-    var activityListener: ActivityListener? = null
+//    var needCloseTheDialog = true
 
     private val oneTapClient = Identity.getSignInClient(activity)
 
@@ -61,24 +64,19 @@ class GoogleHelper(private val activity: AppCompatActivity) {
                 try {
                     val credential = oneTapClient.getSignInCredentialFromIntent(data)
                     val idToken = credential.googleIdToken
-                    val username = credential.id
-                    val password = credential.password
                     when {
                         idToken != null -> {
                             Log.d(TAG, "Got ID token.")
-                            activityListener?.updateUi(username)
-//
-                        }
+                            // Use token to get firebaseCredential
+                            val firebaseCredential = GoogleAuthProvider
+                                .getCredential(idToken, null)
 
-                        password != null -> {
-                            // Got a saved username and password. Use them to authenticate
-                            // with your backend.
-                            Log.d(TAG, "Got password.")
+                            singInWithCredential(firebaseCredential)
                         }
 
                         else -> {
                             // Shouldn't happen.
-                            Log.d(TAG, "No ID token or password!")
+                            Log.d(TAG, "No ID token!")
                         }
                     }
                 } catch (e: ApiException) {
@@ -87,5 +85,23 @@ class GoogleHelper(private val activity: AppCompatActivity) {
             }
         }
     }
+
+    private fun singInWithCredential(firebaseCredential: AuthCredential) {
+        App.firebaseAuth.signInWithCredential(firebaseCredential)
+            .addOnCompleteListener(activity) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "signInWithCredential:success")
+                    App.activityListenerLambda?.invoke()
+                    needCloseTheDialog = true
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "signInWithCredential:failure", task.exception)
+                    // updateUI(null)
+                    needCloseTheDialog = false
+                }
+            }
+    }
+
 }
 

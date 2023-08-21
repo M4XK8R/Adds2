@@ -2,7 +2,6 @@ package com.example.adds2
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
@@ -12,12 +11,11 @@ import androidx.core.view.GravityCompat
 import com.example.adds2.accounthelper.EmailHelper
 import com.example.adds2.accounthelper.GoogleHelper
 import com.example.adds2.databinding.ActivityMainBinding
-import com.example.adds2.dialoghelper.ActivityListener
 import com.example.adds2.dialoghelper.DialogHelper
 import com.example.adds2.dialoghelper.DialogHelperConstants
-import com.example.adds2.dialoghelper.DrawerListener
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseUser
+import kotlin.random.Random
 
 private const val TAG = "MainActivity"
 
@@ -30,8 +28,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var googleHelper: GoogleHelper
     private lateinit var emailHelper: EmailHelper
 
-
-    private var firebaseUser: FirebaseUser? = null
+    private val firebaseUser: FirebaseUser? get() = App.firebaseAuth.currentUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,29 +37,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         dialogHelper = DialogHelper(this)
         googleHelper = GoogleHelper(this)
+        emailHelper = EmailHelper(this)
 
         val header = binding.drawer.getHeaderView(0)
         tvAccount = header.findViewById(R.id.tvAccountEmail)
+        App.activityListenerLambda = { updateUi(firebaseUser) }
 
         setUpDrawer()
-        setUpDrawerListenerInterface()
+        dialogHelper.drawerListenerLambda = ::openDrawer
 
-        setUpActivityListenerInterfaceGoogle()
-
-        firebaseUser = App.firebaseAuth.currentUser
     }
 
     override fun onStart() {
         super.onStart()
-        firebaseUser = App.firebaseAuth.currentUser
-        Log.d(TAG, "firebaseUser = $firebaseUser")
         updateUi(firebaseUser)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         googleHelper.onActivityResultUtil(requestCode, data)
-        Log.d(TAG, "firebaseUser = $firebaseUser")
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -92,42 +85,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
-
-//    fun updateUi(text: String) {
-//        tvAccount.text = text
-//    }
-
     /**
      * PRIVATE FUNCTIONS
      */
-    private fun setUpActivityListenerInterfaceGoogle() {
-        googleHelper.activityListener = object : ActivityListener {
-
-            override fun updateUi(text: String) {
-                tvAccount.text = text
-            }
-
-            override fun updateUi(firebaseUser: FirebaseUser?) {
-                tvAccount.text = firebaseUser.toString()
-            }
-        }
-    }
-
-    private fun setUpActivityListenerInterfaceEmail() {
-        emailHelper.activityListener = object : ActivityListener {
-
-            override fun updateUi(text: String) {
-                tvAccount.text = text
-            }
-
-            override fun updateUi(firebaseUser: FirebaseUser?) {
-                tvAccount.text = firebaseUser.toString()
-            }
-        }
-    }
-
     private fun updateUi(firebaseUser: FirebaseUser?) {
-        tvAccount.text = if (firebaseUser == null) "not logged in" else firebaseUser.email
+        val error = Random.nextInt(405)
+        tvAccount.text = if (firebaseUser == null) "Not logged in #$error" else firebaseUser.email
     }
 
     private fun closeDrawer() {
@@ -144,14 +107,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun makeToastNavTest(id: String) {
         Toast.makeText(this, "Pressed $id", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun setUpDrawerListenerInterface() {
-        dialogHelper.drawerListener = object : DrawerListener {
-            override fun drawerAction() {
-                openDrawer()
-            }
-        }
     }
 
     private fun setUpDrawer() {
@@ -174,5 +129,4 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun openDrawer() {
         binding.drawerLayout.openDrawer(GravityCompat.START)
     }
-
 }

@@ -1,4 +1,4 @@
-package com.example.adds2
+package com.example.adds2.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,11 +8,14 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import com.example.adds2.App
+import com.example.adds2.R
 import com.example.adds2.accounthelper.EmailHelper
 import com.example.adds2.accounthelper.GoogleHelper
 import com.example.adds2.databinding.ActivityMainBinding
 import com.example.adds2.dialoghelper.DialogHelper
 import com.example.adds2.dialoghelper.DialogHelperConstants
+import com.example.adds2.ui.screens.search.fragment.AddsFragment
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseUser
 import kotlin.random.Random
@@ -20,11 +23,11 @@ import kotlin.random.Random
 private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-
     private lateinit var binding: ActivityMainBinding
     private lateinit var tvAccount: TextView
 
     private lateinit var dialogHelper: DialogHelper
+
     private lateinit var googleHelper: GoogleHelper
     private lateinit var emailHelper: EmailHelper
 
@@ -60,7 +63,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.diMyAdds -> makeToastNavTest("diMyAdds")
+            R.id.diMyAdds -> {
+                launchAddsFragment()
+                closeDrawer()
+            }
+
             R.id.diCars -> makeToastNavTest("diCars")
             R.id.diComputers -> makeToastNavTest("diComputers")
             R.id.diSmartphones -> makeToastNavTest("diSmartphones")
@@ -88,6 +95,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     /**
      * PRIVATE FUNCTIONS
      */
+    private fun launchAddsFragment() {
+        supportFragmentManager
+            .beginTransaction()
+            .add(R.id.fragmentContainer, AddsFragment.newInstance())
+            .addToBackStack(null)
+            .commit()
+    }
+
     private fun updateUi(firebaseUser: FirebaseUser?) {
         val error = Random.nextInt(405)
         tvAccount.text = if (firebaseUser == null) "Not logged in #$error" else firebaseUser.email

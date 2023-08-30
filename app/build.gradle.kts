@@ -2,8 +2,6 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-    kotlin("kapt")
-    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -23,26 +21,33 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "1.8"
     }
-   buildFeatures{
-       viewBinding = true
-   }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
 
-    // Dagger
-    implementation("com.google.dagger:hilt-android:2.44")
-    kapt("com.google.dagger:hilt-android-compiler:2.44")
+    // Image picker
+
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+
+    implementation("io.ak1.pix:piximagepicker:1.6.3")
+
+//    implementation("androidx.fragment:fragment-ktx:1.3.2")
 
     // Firebase
     implementation("com.google.firebase:firebase-database-ktx:20.2.2")
@@ -54,6 +59,8 @@ dependencies {
     implementation("com.google.android.material:material:1.8.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.gms:play-services-auth:20.6.0")
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

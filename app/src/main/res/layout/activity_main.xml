@@ -14,6 +14,7 @@
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/drawer"
+        android:background="@color/grey_red_pale"
         app:itemTextAppearance="@style/NavDrawerTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

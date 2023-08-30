@@ -8,12 +8,12 @@ import androidx.viewbinding.ViewBinding
 import com.example.adds2.App
 import com.example.adds2.accounthelper.EmailHelper
 import com.example.adds2.accounthelper.GoogleHelper
-import com.example.adds2.databinding.LogInDialogBinding
-import com.example.adds2.databinding.RegisterDialogBinding
-import com.example.adds2.makeToast
-import com.example.adds2.needCloseTheDialog
+import com.example.adds2.databinding.DialogLogInBinding
+import com.example.adds2.databinding.DialogRegisterBinding
+import com.example.adds2.utils.makeToast
+import com.example.adds2.utils.needCloseTheDialog
 
-class DialogHelper(private val activity: AppCompatActivity) {
+class DialogHelper (private val activity: AppCompatActivity) {
 
     private val emailHelper = EmailHelper(activity)
     private val googleHelper = GoogleHelper(activity)
@@ -34,10 +34,10 @@ class DialogHelper(private val activity: AppCompatActivity) {
      */
     private fun initBinding(state: Int) = when (state) {
         DialogHelperConstants.REGISTER_STATE ->
-            RegisterDialogBinding.inflate(LayoutInflater.from(activity))
+            DialogRegisterBinding.inflate(LayoutInflater.from(activity))
 
         DialogHelperConstants.LOG_IN_STATE ->
-            LogInDialogBinding.inflate(LayoutInflater.from(activity))
+            DialogLogInBinding.inflate(LayoutInflater.from(activity))
 
         else -> throw Exception("Unknown state: $state")
     }
@@ -47,18 +47,21 @@ class DialogHelper(private val activity: AppCompatActivity) {
         .setCancelable(false)
         .setNegativeButton("CANCEL") { dialog, _ ->
             dialog.dismiss()
-            Log.d("drawerListenerLambda", "Create dialog drawerListenerLambda = $drawerListenerLambda")
+            Log.d(
+                "drawerListenerLambda",
+                "Create dialog drawerListenerLambda = $drawerListenerLambda"
+            )
             drawerListenerLambda?.invoke()
         }
         .create()
 
     private fun setUpButtonsClickListeners(binding: ViewBinding, alertDialog: AlertDialog) {
         when (binding) {
-            is RegisterDialogBinding -> {
+            is DialogRegisterBinding -> {
                 setUpBtnRegisterListener(binding, alertDialog)
             }
 
-            is LogInDialogBinding -> {
+            is DialogLogInBinding -> {
                 setUpBtnSignInOneTapClickListener(binding, alertDialog)
                 setUpBtnLogInClickListener(binding, alertDialog)
                 setUpBtnForgotPasswordClickListener(binding)
@@ -67,7 +70,7 @@ class DialogHelper(private val activity: AppCompatActivity) {
     }
 
     private fun setUpBtnSignInOneTapClickListener(
-        binding: LogInDialogBinding,
+        binding: DialogLogInBinding,
         alertDialog: AlertDialog
     ) {
         binding.btnSignInOneTap.setOnClickListener {
@@ -76,7 +79,7 @@ class DialogHelper(private val activity: AppCompatActivity) {
         }
     }
 
-    private fun setUpBtnForgotPasswordClickListener(binding: LogInDialogBinding) {
+    private fun setUpBtnForgotPasswordClickListener(binding: DialogLogInBinding) {
         binding.btnForgotPassword.setOnClickListener {
             val email = binding.etEmail.text.toString()
             if (email.isNotEmpty()) {
@@ -102,7 +105,7 @@ class DialogHelper(private val activity: AppCompatActivity) {
         }
     }
 
-    private fun setUpBtnLogInClickListener(binding: LogInDialogBinding, alertDialog: AlertDialog) {
+    private fun setUpBtnLogInClickListener(binding: DialogLogInBinding, alertDialog: AlertDialog) {
         with(binding) {
             btnLogIn.setOnClickListener {
                 val email = etEmail.text.toString()
@@ -113,7 +116,7 @@ class DialogHelper(private val activity: AppCompatActivity) {
         }
     }
 
-    private fun setUpBtnRegisterListener(binding: RegisterDialogBinding, alertDialog: AlertDialog) {
+    private fun setUpBtnRegisterListener(binding: DialogRegisterBinding, alertDialog: AlertDialog) {
         with(binding) {
             btnRegister.setOnClickListener {
                 val email = etEmail.text.toString()

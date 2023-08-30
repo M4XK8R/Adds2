@@ -4,7 +4,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.adds2.App
-import com.example.adds2.needCloseTheDialog
+import com.example.adds2.utils.needCloseTheDialog
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 
 class EmailHelper(private val activity: AppCompatActivity) {
@@ -28,8 +30,22 @@ class EmailHelper(private val activity: AppCompatActivity) {
                         makeToast("Auth task is successful!")
                         needCloseTheDialog = true
                     } else {
+//                        makeToast("Auth task failed")
+                        if (task.exception is FirebaseAuthUserCollisionException) {
+                            makeToast("EMAIL ALREADY IN USE")
+                            // Link email
+                            val credential = EmailAuthProvider
+                                .getCredential(email, password)
+                            App.firebaseAuth.currentUser?.linkWithCredential(credential)
+                                ?.addOnCompleteListener { linkTask ->
+                                    if (linkTask.isSuccessful) {
+                                        makeToast("TASK LINK EMAIL IS SUCCESSFUL")
+                                    } else {
+                                        makeToast("TASK LINK EMAIL IS FAILED")
+                                    }
+                                }
+                        }
                         needCloseTheDialog = false
-                        makeToast("Auth task failed")
                     }
                 }
         } else {

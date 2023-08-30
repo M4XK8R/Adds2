@@ -3,4 +3,5 @@
     <dimen name="margin_default">12dp</dimen>
     <dimen name="text_size_default">20sp</dimen>
     <dimen name="text_size_large">26sp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>

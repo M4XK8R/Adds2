@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.startIntentSenderForResult
 import com.example.adds2.App
 import com.example.adds2.R
-import com.example.adds2.needCloseTheDialog
+import com.example.adds2.utils.needCloseTheDialog
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.common.api.ApiException
